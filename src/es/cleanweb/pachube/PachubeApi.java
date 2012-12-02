@@ -11,7 +11,8 @@ import android.util.Log;
 
 public class PachubeApi {
     static final String PACHUBE_URL = "http://api.cosm.com/v2/feeds/";
-    static final String FEED_ID = "89389";
+//    static final String FEED_ID = "89392";//GUS
+    static final String FEED_ID = "89389";//ALE
     static final String API_KEY = "bG6AVQou1cNpqkVK1PCuHY1aTISSAKxHdVZBVzVLQlgrMD0g";
     static final String HEADEAR_API_KEY = "X-ApiKey";
     

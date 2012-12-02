@@ -1,10 +1,14 @@
 package com.example.breathin;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import es.cleanweb.maps.MapsApi;
+import es.cleanweb.model.Coords;
 import es.cleanweb.model.FeedUpdate;
 import es.cleanweb.pachube.PachubeApi;
 
@@ -15,20 +19,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 public class ReceiveData extends Activity {
-    protected static final String USER_ID = "626292957";
+    // protected static final String USER_ID = "652022076";//GUS
+    protected static final String USER_ID = "626292957";// ALE
     private TextView humidity;
     private TextView temperature;
     private TextView latitude;
     private TextView longitude;
     private TextView speed;
     private TextView altitude;
+    private Button start;
+    private Button end;
     private String currentData = "";
     private EditText capturer;
     private int currentTemp = 0;
@@ -37,9 +48,12 @@ public class ReceiveData extends Activity {
     private int currentHeartBeat = 120;
     private int currentMagnet = 5;
     private int currentDbNoise = 30;
+    private long before = 0;
+    private long TIMESTAMP = 10000;
     private TextWatcher watcher;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private List<Coords> waypoints = new LinkedList<Coords>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +67,28 @@ public class ReceiveData extends Activity {
         speed = (TextView) findViewById(R.id.speed);
         altitude = (TextView) findViewById(R.id.altitude);
         capturer = (EditText) findViewById(R.id.capturer);
+        start = (Button) findViewById(R.id.start_button);
+        end = (Button) findViewById(R.id.stop_button);
 
+        start.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // Register the listener with the Location Manager to receive
+                // location
+                // updates
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            }
+        });
+
+        end.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                new GoogleApiRequest().execute();
+            }
+        });
         // Acquire a reference to the system Location Manager
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -67,14 +102,18 @@ public class ReceiveData extends Activity {
                 longitude.setText("" + location.getLongitude());
                 latitude.setText("" + location.getLatitude());
                 altitude.setText("" + location.getAltitude());
-                speed.setText("" + (int)(location.getSpeed() * 3.6) + "Km/H");
+                speed.setText("" + (int) (location.getSpeed() * 3.6) + "Km/H");
                 // set x y on interface and call pachube updating feed.
-                FeedUpdate feed = new FeedUpdate(USER_ID, "" + location.getLatitude(), "" + location.getLongitude(), ""
-                        + location.getAltitude(), "" + currentHumidity, "" + currentTemp, "" + currentCo, ""
-                        + currentHeartBeat, "" + currentMagnet, "" + currentDbNoise);
-
-                new PachubeCall(feed).execute();
-
+                if (System.currentTimeMillis() - before > TIMESTAMP) {
+                    before = System.currentTimeMillis();
+                    FeedUpdate feed = new FeedUpdate(USER_ID, "" + location.getLatitude(),
+                            "" + location.getLongitude(), "" + location.getAltitude(), "" + currentHumidity, ""
+                                    + currentTemp, "" + currentCo, "" + currentHeartBeat, "" + currentMagnet, ""
+                                    + currentDbNoise);
+                    new PachubeCall(feed).execute();
+                    // save possible waypoints
+                    waypoints.add(new Coords("" + location.getLatitude(), "" + location.getLongitude()));
+                }
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -89,11 +128,6 @@ public class ReceiveData extends Activity {
                 Log.d("MI_DEP", "provider disabled");
             }
         };
-
-        // Register the listener with the Location Manager to receive location
-        // updates
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
         watcher = new TextWatcher() {
 
@@ -140,7 +174,9 @@ public class ReceiveData extends Activity {
 
     @Override
     protected void onStop() {
-        locationManager.removeUpdates(locationListener);
+        if (locationManager.getProviders(true).size() > 0) {
+            locationManager.removeUpdates(locationListener);
+        }
         super.onStop();
     }
 
@@ -164,6 +200,45 @@ public class ReceiveData extends Activity {
             }
             return null;
         }
-
     }
+
+    class GoogleApiRequest extends AsyncTask<Void, Void, Void> {
+        private String distance = "";
+
+        @Override
+        protected void onPostExecute(Void result) {
+            Intent resultactivity = new Intent(ReceiveData.this, ResultActivity.class);
+            resultactivity.putExtra(ResultActivity.DISTANCE, distance);
+            startActivity(resultactivity);
+            super.onPostExecute(result);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (locationManager.getProviders(true).size() > 0) {
+                locationManager.removeUpdates(locationListener);
+            }
+            List<Coords> finalWaypoints = new LinkedList<Coords>();
+            int selector = waypoints.size() / 8;
+            if (selector >= 1) {
+                for (int z = 0; z < 8; z++) {
+                    finalWaypoints.add(waypoints.get(selector * z));
+                }
+            }
+            int size = waypoints.size();
+            JSONObject response = MapsApi.getRoute(finalWaypoints, waypoints.get(0),
+                    waypoints.get(waypoints.size() - 1));
+
+            try {
+                distance = response.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0)
+                        .getJSONObject("distance").getString("text");
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            Log.d("MI_DEP", distance);
+            return null;
+        }
+    }
+
 }

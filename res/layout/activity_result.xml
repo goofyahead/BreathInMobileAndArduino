@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ResultActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center" >
+
+        <RelativeLayout
+            android:id="@+id/calories_bar"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:background="@drawable/greem_button" >
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/heart"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:background="@drawable/violet_button" >
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/pollution"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:background="@drawable/blue_button" >
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/footprint"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:background="@drawable/color_button" >
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/distanceBar"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:background="@drawable/red_button" >
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Large Text"
+        android:textSize="32sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/calories_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="Met"
+            android:textSize="20sp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/distance_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mext"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/heart_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:textSize="20sp"
+            android:text="ext"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </LinearLayout>
+
+</RelativeLayout>
