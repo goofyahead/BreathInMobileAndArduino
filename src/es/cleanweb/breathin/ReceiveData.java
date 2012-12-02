@@ -1,4 +1,4 @@
-package com.example.breathin;
+package es.cleanweb.breathin;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -6,6 +6,13 @@ import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.android.DialogError;
+import com.facebook.android.Facebook;
+import com.facebook.android.FacebookError;
+
+import es.cleanweb.breathin.R;
 
 import es.cleanweb.maps.MapsApi;
 import es.cleanweb.model.Coords;
@@ -28,6 +35,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.facebook.android.Facebook.*;
 
 public class ReceiveData extends Activity {
     // protected static final String USER_ID = "652022076";//GUS
@@ -54,11 +62,30 @@ public class ReceiveData extends Activity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private List<Coords> waypoints = new LinkedList<Coords>();
+    Facebook facebook = new Facebook("173796479433716");
+    AsyncFacebookRunner mAsyncRunner = new AsyncFacebookRunner(facebook);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_data);
+        
+        //LOGIN FB
+        facebook.authorize(this, new DialogListener() {
+            @Override
+            public void onComplete(Bundle values) {}
+
+            @Override
+            public void onFacebookError(FacebookError error) {}
+
+            @Override
+            public void onError(DialogError e) {}
+
+            @Override
+            public void onCancel() {}
+        });
+        //LOGIN FB
+        
 
         humidity = (TextView) findViewById(R.id.humidity);
         temperature = (TextView) findViewById(R.id.temperature);
@@ -170,6 +197,12 @@ public class ReceiveData extends Activity {
 
         capturer.addTextChangedListener(watcher);
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        facebook.authorizeCallback(requestCode, resultCode, data);
     }
 
     @Override

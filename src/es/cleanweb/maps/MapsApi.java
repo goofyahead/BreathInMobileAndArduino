@@ -1,5 +1,6 @@
 package es.cleanweb.maps;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
+import android.net.Uri;
 
 import es.cleanweb.model.Coords;
 
@@ -32,6 +35,7 @@ public class MapsApi {
             getURL = getURL.replace(ORIGIN_LON, "" + origin.getLongitude());
             getURL = getURL.replace(DEST_LAT, "" + destiny.getLatitude());
             getURL = getURL.replace(DEST_LON, "" + destiny.getLongitude());
+
 //            if (waypoints.size() > 0) {
 //                getURL = getURL + WAYPOINTS;
 //            }
@@ -40,6 +44,8 @@ public class MapsApi {
 //                if (waypoints.get(waypoints.size() - 1) != coord)
 //                    getURL = getURL + WAYPOINT_JOIN;
 //            }
+//            URI uriToGet = URI.create(getURL);
+            
             HttpGet get = new HttpGet(getURL);
             HttpResponse responseGet = client.execute(get);
             HttpEntity resEntityGet = responseGet.getEntity();
