@@ -36,8 +36,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.facebook.android.Facebook.*;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapView;
 
-public class ReceiveData extends Activity {
+public class ReceiveData extends MapActivity {
     // protected static final String USER_ID = "652022076";//GUS
     protected static final String USER_ID = "626292957";// ALE
     private TextView humidity;
@@ -60,6 +63,7 @@ public class ReceiveData extends Activity {
     private long TIMESTAMP = 10000;
     private TextWatcher watcher;
     private LocationManager locationManager;
+    private MapView map;
     private LocationListener locationListener;
     private List<Coords> waypoints = new LinkedList<Coords>();
     Facebook facebook = new Facebook("173796479433716");
@@ -86,7 +90,8 @@ public class ReceiveData extends Activity {
         });
         //LOGIN FB
         
-
+        map = (MapView) findViewById(R.id.mapView);
+        map.getController().setZoom(16);
         humidity = (TextView) findViewById(R.id.humidity);
         temperature = (TextView) findViewById(R.id.temperature);
         latitude = (TextView) findViewById(R.id.latitude);
@@ -126,6 +131,11 @@ public class ReceiveData extends Activity {
                 // Called when a new location is found by the network location
                 // provider.
                 Log.d("MI_DEP", "updated Location");
+                GeoPoint myGeoPoint = new GeoPoint(
+                        (int)(location.getLatitude()*1000000),
+                        (int)(location.getLongitude()*1000000));
+                map.getController().animateTo(myGeoPoint);
+               
                 longitude.setText("" + location.getLongitude());
                 latitude.setText("" + location.getLatitude());
                 altitude.setText("" + location.getAltitude());
@@ -272,6 +282,12 @@ public class ReceiveData extends Activity {
             Log.d("MI_DEP", distance);
             return null;
         }
+    }
+
+    @Override
+    protected boolean isRouteDisplayed() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

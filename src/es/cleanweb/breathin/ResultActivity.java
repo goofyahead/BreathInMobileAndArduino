@@ -6,6 +6,7 @@ import com.facebook.android.DialogError;
 import com.facebook.android.Facebook;
 import com.facebook.android.FacebookError;
 import com.facebook.android.Facebook.DialogListener;
+import com.google.android.maps.MapActivity;
 
 import es.cleanweb.breathin.R;
 

@@ -5,6 +5,14 @@
     tools:context=".ReceiveData" 
     android:background="@android:color/black">
 
+  <com.google.android.maps.MapView
+      android:id="@+id/mapView"
+      android:layout_width="220dp"
+      android:layout_height="350dp"
+      android:apiKey="08IhLiPOOK7Ihw4E8zI5Oz_Xi27Av8DakLagGVw"
+      android:clickable="true"
+      android:enabled="true" />
+        
     <EditText
         android:id="@+id/capturer"
         android:layout_width="match_parent"
